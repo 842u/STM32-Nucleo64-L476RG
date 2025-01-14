@@ -1,11 +1,9 @@
+#include "main.h"
 #include "stm32l4xx_hal.h"
 
 #define ON_BOARD_LD2_PIN GPIO_PIN_5
 #define ON_BOARD_LD2_PORT GPIOA
 #define ON_BOARD_LD2_BLINK_DELAY 250
-
-void setupOnBoardLD2(GPIO_InitTypeDef *GPIOInitStruct);
-void blinkOnBoardLD2(void);
 
 int main() {
   HAL_Init();
