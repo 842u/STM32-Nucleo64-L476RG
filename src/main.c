@@ -1,12 +1,9 @@
 #include "main.h"
+#include "onBoardLD2.h"
 
 int main() {
   HAL_Init();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-
-  GPIO_InitTypeDef LD2InitStruct = {0};
-  setupOnBoardLD2(&LD2InitStruct);
+  onBoardLD2Init();
 
   GPIO_InitTypeDef B1InitStruct = {0};
   setupOnBardB1(&B1InitStruct);
@@ -15,30 +12,20 @@ int main() {
 
   while (1) {
     handleOnBoardB1(&delayMultiplier);
-    blinkOnBoardLD2(ON_BOARD_LD2_BLINK_DELAY_BASE * delayMultiplier);
+    onBoardLD2Blink(ON_BOARD_LD2_BLINK_DELAY_BASE * delayMultiplier);
   }
 }
 
 void SysTick_Handler(void) { HAL_IncTick(); }
 
-void setupOnBoardLD2(GPIO_InitTypeDef *GPIOInitStruct) {
-  GPIOInitStruct->Pin = ON_BOARD_LD2_PIN;
-  GPIOInitStruct->Mode = GPIO_MODE_OUTPUT_PP;
-  GPIOInitStruct->Pull = GPIO_NOPULL;
-  GPIOInitStruct->Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(ON_BOARD_LD2_PORT, GPIOInitStruct);
-}
-
-void blinkOnBoardLD2(int delay) {
-  HAL_GPIO_TogglePin(ON_BOARD_LD2_PORT, ON_BOARD_LD2_PIN);
-  HAL_Delay(delay);
-}
-
 void setupOnBardB1(GPIO_InitTypeDef *GPIOInitStruct) {
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+
   GPIOInitStruct->Pin = ON_BOARD_B1_PIN;
   GPIOInitStruct->Mode = GPIO_MODE_INPUT;
   GPIOInitStruct->Pull = GPIO_PULLUP;
   GPIOInitStruct->Speed = GPIO_SPEED_FREQ_LOW;
+
   HAL_GPIO_Init(ON_BOARD_B1_PORT, GPIOInitStruct);
 }
 
