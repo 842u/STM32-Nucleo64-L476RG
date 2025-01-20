@@ -6,6 +6,17 @@ int main() {
   pwmTimerRGBLEDInit();
 
   while (1) {
+    setD1Color(15, 15, 15);
+    HAL_Delay(1000);
+
+    setD1Color(15, 0, 0);
+    HAL_Delay(1000);
+
+    setD1Color(0, 15, 0);
+    HAL_Delay(1000);
+
+    setD1Color(0, 0, 15);
+    HAL_Delay(1000);
   }
 }
 

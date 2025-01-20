@@ -28,11 +28,16 @@ static void gpioD1Setup(void) {
   HAL_GPIO_Init(D1_PORT, &gpioD1BConfig);
 }
 
+/*
+** Lower timer frequency to 1MHz.
+** Default timer input clock is 80MHz, derived from system clock.
+** clock / ((prescaler + 1) * (period + 1))
+*/
 static void timerD1Setup(void) {
   htim3.Instance = D1_TIMER;
-  htim3.Init.Prescaler = 79;
+  htim3.Init.Prescaler = D1_TIMER_PRESCALER;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 999;
+  htim3.Init.Period = D1_TIMER_PERIOD;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   HAL_TIM_PWM_Init(&htim3);
@@ -67,6 +72,16 @@ static void pwmD1Start(void) {
   HAL_TIM_PWM_Start(&htim3, D1_B_CHANNEL);
 }
 
+static double calculatePercentage(double percentage, double value) {
+  if (percentage < 0.0) {
+    percentage = 0.0;
+  } else if (percentage > 100.0) {
+    percentage = 100.0;
+  }
+
+  return (percentage / 100.0) * value;
+}
+
 void pwmTimerRGBLEDInit(void) {
   __HAL_RCC_TIM3_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -74,4 +89,13 @@ void pwmTimerRGBLEDInit(void) {
   timerD1Setup();
   pwmD1Setup();
   pwmD1Start();
+}
+
+void setD1Color(int redPercentage, int greenPercentage, int bluePercentage) {
+  __HAL_TIM_SET_COMPARE(&htim3, D1_R_CHANNEL,
+                        calculatePercentage(redPercentage, D1_TIMER_PERIOD));
+  __HAL_TIM_SET_COMPARE(&htim3, D1_G_CHANNEL,
+                        calculatePercentage(greenPercentage, D1_TIMER_PERIOD));
+  __HAL_TIM_SET_COMPARE(&htim3, D1_B_CHANNEL,
+                        calculatePercentage(bluePercentage, D1_TIMER_PERIOD));
 }
