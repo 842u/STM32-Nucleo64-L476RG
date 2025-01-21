@@ -99,3 +99,56 @@ void setD1Color(int redPercentage, int greenPercentage, int bluePercentage) {
   __HAL_TIM_SET_COMPARE(&htim3, D1_B_CHANNEL,
                         calculatePercentage(bluePercentage, D1_TIMER_PERIOD));
 }
+
+void setD1Rainbow(int *redPercentage, int *greenPercentage, int *bluePercentage,
+                  int brightnessPercentage) {
+  if (*redPercentage == 0 && *greenPercentage == 0 && *bluePercentage == 0) {
+    for (int i = 0; i <= brightnessPercentage; i++) {
+      *redPercentage = i;
+      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
+      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
+    };
+  } else if (*redPercentage == brightnessPercentage && *greenPercentage == 0 &&
+             *bluePercentage == 0) {
+    for (int i = 0; i <= brightnessPercentage; i++) {
+      *greenPercentage = i;
+      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
+      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
+    };
+  } else if (*redPercentage == brightnessPercentage &&
+             *greenPercentage == brightnessPercentage && *bluePercentage == 0) {
+    for (int i = brightnessPercentage; i >= 0; i--) {
+      *redPercentage = i;
+      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
+      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
+    };
+  } else if (*redPercentage == 0 && *greenPercentage == brightnessPercentage &&
+             *bluePercentage == 0) {
+    for (int i = 0; i <= brightnessPercentage; i++) {
+      *bluePercentage = i;
+      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
+      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
+    };
+  } else if (*redPercentage == 0 && *greenPercentage == brightnessPercentage &&
+             *bluePercentage == brightnessPercentage) {
+    for (int i = brightnessPercentage; i >= 0; i--) {
+      *greenPercentage = i;
+      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
+      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
+    };
+  } else if (*redPercentage == 0 && *greenPercentage == 0 &&
+             *bluePercentage == brightnessPercentage) {
+    for (int i = 0; i <= brightnessPercentage; i++) {
+      *redPercentage = i;
+      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
+      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
+    };
+  } else if (*redPercentage == brightnessPercentage && *greenPercentage == 0 &&
+             *bluePercentage == brightnessPercentage) {
+    for (int i = brightnessPercentage; i >= 0; i--) {
+      *bluePercentage = i;
+      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
+      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
+    };
+  }
+}

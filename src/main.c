@@ -1,22 +1,18 @@
 #include "main.h"
 #include "pwmTimerRGBLED.h"
 
+#define BLINK_DELAY 250
+
 int main() {
   HAL_Init();
   pwmTimerRGBLEDInit();
 
+  int redPercentage = 0;
+  int greenPercentage = 0;
+  int bluePercentage = 0;
+
   while (1) {
-    setD1Color(15, 15, 15);
-    HAL_Delay(1000);
-
-    setD1Color(15, 0, 0);
-    HAL_Delay(1000);
-
-    setD1Color(0, 15, 0);
-    HAL_Delay(1000);
-
-    setD1Color(0, 0, 15);
-    HAL_Delay(1000);
+    setD1Rainbow(&redPercentage, &greenPercentage, &bluePercentage, 10);
   }
 }
 
