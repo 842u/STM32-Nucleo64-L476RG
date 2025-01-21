@@ -12,7 +12,7 @@ int main() {
   int bluePercentage = 0;
 
   while (1) {
-    setD1Rainbow(&redPercentage, &greenPercentage, &bluePercentage, 10);
+    setD1Rainbow(&redPercentage, &greenPercentage, &bluePercentage, 100);
   }
 }
 

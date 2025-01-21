@@ -18,7 +18,7 @@
 #define D1_B_CHANNEL TIM_CHANNEL_1
 #define D1_B_PIN GPIO_PIN_6
 
-#define D1_RAINBOW_DELAY 25
+#define D1_RAINBOW_DELAY 10
 
 void pwmTimerRGBLEDInit(void);
 void setD1Color(int redPercentage, int greenPercentage, int bluePercentage);

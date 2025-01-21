@@ -29,7 +29,7 @@ static void gpioD1Setup(void) {
 }
 
 /*
-** Lower timer frequency to 1MHz.
+** Lower timer frequency to 1kHz.
 ** Default timer input clock is 80MHz, derived from system clock.
 ** clock / ((prescaler + 1) * (period + 1))
 */
@@ -102,53 +102,25 @@ void setD1Color(int redPercentage, int greenPercentage, int bluePercentage) {
 
 void setD1Rainbow(int *redPercentage, int *greenPercentage, int *bluePercentage,
                   int brightnessPercentage) {
-  if (*redPercentage == 0 && *greenPercentage == 0 && *bluePercentage == 0) {
+  const int transitions[8][3] = {
+      {1, 0, 0},  // Red increase
+      {0, 1, 0},  // Green increase
+      {-1, 0, 0}, // Red decrease
+      {0, 0, 1},  // Blue increase
+      {0, -1, 0}, // Green decrease
+      {1, 0, 0},  // Red increase
+      {0, 0, -1}, // Blue decrease
+      {-1, 0, 0}  // Red decrease
+  };
+
+  for (int state = 0; state < 8; state++) {
     for (int i = 0; i <= brightnessPercentage; i++) {
-      *redPercentage = i;
+      *redPercentage += transitions[state][0];
+      *greenPercentage += transitions[state][1];
+      *bluePercentage += transitions[state][2];
+
       setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
       HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
-    };
-  } else if (*redPercentage == brightnessPercentage && *greenPercentage == 0 &&
-             *bluePercentage == 0) {
-    for (int i = 0; i <= brightnessPercentage; i++) {
-      *greenPercentage = i;
-      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
-      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
-    };
-  } else if (*redPercentage == brightnessPercentage &&
-             *greenPercentage == brightnessPercentage && *bluePercentage == 0) {
-    for (int i = brightnessPercentage; i >= 0; i--) {
-      *redPercentage = i;
-      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
-      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
-    };
-  } else if (*redPercentage == 0 && *greenPercentage == brightnessPercentage &&
-             *bluePercentage == 0) {
-    for (int i = 0; i <= brightnessPercentage; i++) {
-      *bluePercentage = i;
-      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
-      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
-    };
-  } else if (*redPercentage == 0 && *greenPercentage == brightnessPercentage &&
-             *bluePercentage == brightnessPercentage) {
-    for (int i = brightnessPercentage; i >= 0; i--) {
-      *greenPercentage = i;
-      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
-      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
-    };
-  } else if (*redPercentage == 0 && *greenPercentage == 0 &&
-             *bluePercentage == brightnessPercentage) {
-    for (int i = 0; i <= brightnessPercentage; i++) {
-      *redPercentage = i;
-      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
-      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
-    };
-  } else if (*redPercentage == brightnessPercentage && *greenPercentage == 0 &&
-             *bluePercentage == brightnessPercentage) {
-    for (int i = brightnessPercentage; i >= 0; i--) {
-      *bluePercentage = i;
-      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
-      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
-    };
+    }
   }
 }
