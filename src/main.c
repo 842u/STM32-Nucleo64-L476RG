@@ -1,12 +1,18 @@
 #include "main.h"
-#include "externalLEDToggle.h"
+#include "pwmTimerRGBLED.h"
+
+#define BLINK_DELAY 250
 
 int main() {
   HAL_Init();
-  externalLEDToggleInit();
+  pwmTimerRGBLEDInit();
+
+  int redPercentage = 0;
+  int greenPercentage = 0;
+  int bluePercentage = 0;
 
   while (1) {
-    SW1Handler();
+    setD1Rainbow(&redPercentage, &greenPercentage, &bluePercentage, 100);
   }
 }
 
