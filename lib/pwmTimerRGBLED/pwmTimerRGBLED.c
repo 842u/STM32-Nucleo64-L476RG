@@ -106,8 +106,11 @@ void setD1Green(void) { setD1Color(0, 100, 0); }
 void setD1Blue(void) { setD1Color(0, 0, 100); }
 void setD1White(void) { setD1Color(100, 100, 100); }
 
-void setD1Rainbow(int *redPercentage, int *greenPercentage, int *bluePercentage,
-                  int brightnessPercentage) {
+void setD1Rainbow(int brightnessPercentage) {
+  int redPercentage = 0;
+  int greenPercentage = 0;
+  int bluePercentage = 0;
+
   const int transitions[8][3] = {
       {1, 0, 0},  // Red increase
       {0, 1, 0},  // Green increase
@@ -119,14 +122,16 @@ void setD1Rainbow(int *redPercentage, int *greenPercentage, int *bluePercentage,
       {-1, 0, 0}  // Red decrease
   };
 
-  for (int state = 0; state < 8; state++) {
-    for (int i = 0; i <= brightnessPercentage; i++) {
-      *redPercentage += transitions[state][0];
-      *greenPercentage += transitions[state][1];
-      *bluePercentage += transitions[state][2];
+  while (1) {
+    for (int state = 0; state < 8; state++) {
+      for (int i = 0; i <= brightnessPercentage; i++) {
+        redPercentage += transitions[state][0];
+        greenPercentage += transitions[state][1];
+        bluePercentage += transitions[state][2];
 
-      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
-      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
+        setD1Color(redPercentage, greenPercentage, bluePercentage);
+        HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
+      }
     }
   }
 }

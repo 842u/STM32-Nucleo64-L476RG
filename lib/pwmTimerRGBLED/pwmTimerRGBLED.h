@@ -25,7 +25,6 @@ void setD1Red(void);
 void setD1Green(void);
 void setD1Blue(void);
 void setD1White(void);
-void setD1Rainbow(int *redPercentage, int *greenPercentage, int *bluePercentage,
-                  int brightnessPercentage);
+void setD1Rainbow(int brightnessPercentage);
 
 #endif
