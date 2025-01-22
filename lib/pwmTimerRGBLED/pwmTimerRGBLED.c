@@ -82,6 +82,16 @@ static double calculatePercentage(double percentage, double value) {
   return (percentage / 100.0) * value;
 }
 
+static void setD1Color(int redPercentage, int greenPercentage,
+                       int bluePercentage) {
+  __HAL_TIM_SET_COMPARE(&htim3, D1_R_CHANNEL,
+                        calculatePercentage(redPercentage, D1_TIMER_PERIOD));
+  __HAL_TIM_SET_COMPARE(&htim3, D1_G_CHANNEL,
+                        calculatePercentage(greenPercentage, D1_TIMER_PERIOD));
+  __HAL_TIM_SET_COMPARE(&htim3, D1_B_CHANNEL,
+                        calculatePercentage(bluePercentage, D1_TIMER_PERIOD));
+}
+
 void pwmTimerRGBLEDInit(void) {
   __HAL_RCC_TIM3_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -91,14 +101,10 @@ void pwmTimerRGBLEDInit(void) {
   pwmD1Start();
 }
 
-void setD1Color(int redPercentage, int greenPercentage, int bluePercentage) {
-  __HAL_TIM_SET_COMPARE(&htim3, D1_R_CHANNEL,
-                        calculatePercentage(redPercentage, D1_TIMER_PERIOD));
-  __HAL_TIM_SET_COMPARE(&htim3, D1_G_CHANNEL,
-                        calculatePercentage(greenPercentage, D1_TIMER_PERIOD));
-  __HAL_TIM_SET_COMPARE(&htim3, D1_B_CHANNEL,
-                        calculatePercentage(bluePercentage, D1_TIMER_PERIOD));
-}
+void setD1Red(void) { setD1Color(100, 0, 0); }
+void setD1Green(void) { setD1Color(0, 100, 0); }
+void setD1Blue(void) { setD1Color(0, 0, 100); }
+void setD1White(void) { setD1Color(100, 100, 100); }
 
 void setD1Rainbow(int *redPercentage, int *greenPercentage, int *bluePercentage,
                   int brightnessPercentage) {

@@ -1,8 +1,6 @@
 #include "main.h"
 #include "pwmTimerRGBLED.h"
 
-#define BLINK_DELAY 250
-
 int main() {
   HAL_Init();
   pwmTimerRGBLEDInit();
