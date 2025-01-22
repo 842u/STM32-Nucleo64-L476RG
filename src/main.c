@@ -5,15 +5,12 @@
 #define SW1_PIN GPIO_PIN_5
 #define SW1_IRQn EXTI9_5_IRQn
 
-void SysTick_Handler(void) { HAL_IncTick(); }
+void EXTI9_5_IRQHandler(void);
+void SysTick_Handler(void);
 
-volatile int interruptFlag = 0;
-void EXTI9_5_IRQHandler(void) {
-  if (__HAL_GPIO_EXTI_GET_IT(SW1_PIN) != RESET) {
-    __HAL_GPIO_EXTI_CLEAR_IT(SW1_PIN);
-    interruptFlag = 1;
-  }
-}
+typedef void (*ledColorFunction)(int *exitFlag);
+
+int interruptFlag = 0;
 
 int main() {
   HAL_Init();
@@ -28,4 +25,22 @@ int main() {
 
   HAL_NVIC_SetPriority(SW1_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(SW1_IRQn);
+
+  ledColorFunction ledModes[5] = {setD1Red, setD1Green, setD1Blue, setD1White,
+                                  setD1Rainbow};
+
+  while (1) {
+    for (int i = 0, currentMode = 0; i < 5; i++, currentMode++) {
+      ledModes[currentMode](&interruptFlag);
+    }
+  }
 }
+
+void EXTI9_5_IRQHandler(void) {
+  if (__HAL_GPIO_EXTI_GET_IT(SW1_PIN) != RESET) {
+    __HAL_GPIO_EXTI_CLEAR_IT(SW1_PIN);
+    interruptFlag = 1;
+  }
+}
+
+void SysTick_Handler(void) { HAL_IncTick(); }

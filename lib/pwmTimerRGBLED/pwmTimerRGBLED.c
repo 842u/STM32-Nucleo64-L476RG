@@ -106,7 +106,7 @@ void setD1Red(int *exitFlag) {
   while (1) {
     if (*exitFlag) {
       *exitFlag = 0;
-      break;
+      return;
     }
     HAL_Delay(25);
   }
@@ -117,7 +117,7 @@ void setD1Green(int *exitFlag) {
   while (1) {
     if (*exitFlag) {
       *exitFlag = 0;
-      break;
+      return;
     }
     HAL_Delay(25);
   }
@@ -128,7 +128,7 @@ void setD1Blue(int *exitFlag) {
   while (1) {
     if (*exitFlag) {
       *exitFlag = 0;
-      break;
+      return;
     }
     HAL_Delay(25);
   }
@@ -139,7 +139,7 @@ void setD1White(int *exitFlag) {
   while (1) {
     if (*exitFlag) {
       *exitFlag = 0;
-      break;
+      return;
     }
     HAL_Delay(25);
   }
