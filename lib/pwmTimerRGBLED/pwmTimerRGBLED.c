@@ -7,7 +7,7 @@ static void gpioD1Setup(void) {
   gpioD1RConfig.Mode = GPIO_MODE_AF_PP;
   gpioD1RConfig.Pin = D1_R_PIN;
   gpioD1RConfig.Pull = GPIO_NOPULL;
-  gpioD1RConfig.Speed = GPIO_SPEED_HIGH;
+  gpioD1RConfig.Speed = GPIO_SPEED_LOW;
   gpioD1RConfig.Alternate = GPIO_AF2_TIM3;
   HAL_GPIO_Init(D1_PORT, &gpioD1RConfig);
 
@@ -15,7 +15,7 @@ static void gpioD1Setup(void) {
   gpioD1GConfig.Mode = GPIO_MODE_AF_PP;
   gpioD1GConfig.Pin = D1_G_PIN;
   gpioD1GConfig.Pull = GPIO_NOPULL;
-  gpioD1GConfig.Speed = GPIO_SPEED_HIGH;
+  gpioD1GConfig.Speed = GPIO_SPEED_LOW;
   gpioD1GConfig.Alternate = GPIO_AF2_TIM3;
   HAL_GPIO_Init(D1_PORT, &gpioD1GConfig);
 
@@ -23,7 +23,7 @@ static void gpioD1Setup(void) {
   gpioD1BConfig.Mode = GPIO_MODE_AF_PP;
   gpioD1BConfig.Pin = D1_B_PIN;
   gpioD1BConfig.Pull = GPIO_NOPULL;
-  gpioD1BConfig.Speed = GPIO_SPEED_HIGH;
+  gpioD1BConfig.Speed = GPIO_SPEED_LOW;
   gpioD1BConfig.Alternate = GPIO_AF2_TIM3;
   HAL_GPIO_Init(D1_PORT, &gpioD1BConfig);
 }
@@ -101,12 +101,51 @@ void pwmTimerRGBLEDInit(void) {
   pwmD1Start();
 }
 
-void setD1Red(void) { setD1Color(100, 0, 0); }
-void setD1Green(void) { setD1Color(0, 100, 0); }
-void setD1Blue(void) { setD1Color(0, 0, 100); }
-void setD1White(void) { setD1Color(100, 100, 100); }
+void setD1Red(int *exitFlag) {
+  setD1Color(100, 0, 0);
+  while (1) {
+    if (*exitFlag) {
+      *exitFlag = 0;
+      break;
+    }
+    HAL_Delay(25);
+  }
+}
 
-void setD1Rainbow(int brightnessPercentage) {
+void setD1Green(int *exitFlag) {
+  setD1Color(0, 100, 0);
+  while (1) {
+    if (*exitFlag) {
+      *exitFlag = 0;
+      break;
+    }
+    HAL_Delay(25);
+  }
+}
+
+void setD1Blue(int *exitFlag) {
+  setD1Color(0, 0, 100);
+  while (1) {
+    if (*exitFlag) {
+      *exitFlag = 0;
+      break;
+    }
+    HAL_Delay(25);
+  }
+}
+
+void setD1White(int *exitFlag) {
+  setD1Color(100, 100, 100);
+  while (1) {
+    if (*exitFlag) {
+      *exitFlag = 0;
+      break;
+    }
+    HAL_Delay(25);
+  }
+}
+
+void setD1Rainbow(int *exitFlag) {
   int redPercentage = 0;
   int greenPercentage = 0;
   int bluePercentage = 0;
@@ -124,13 +163,17 @@ void setD1Rainbow(int brightnessPercentage) {
 
   while (1) {
     for (int state = 0; state < 8; state++) {
-      for (int i = 0; i <= brightnessPercentage; i++) {
+      for (int i = 0; i <= 100; i++) {
+        if (*exitFlag) {
+          *exitFlag = 0;
+          return;
+        }
         redPercentage += transitions[state][0];
         greenPercentage += transitions[state][1];
         bluePercentage += transitions[state][2];
 
         setD1Color(redPercentage, greenPercentage, bluePercentage);
-        HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
+        HAL_Delay(D1_RAINBOW_DELAY);
       }
     }
   }

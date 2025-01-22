@@ -21,10 +21,10 @@
 #define D1_RAINBOW_DELAY 10
 
 void pwmTimerRGBLEDInit(void);
-void setD1Red(void);
-void setD1Green(void);
-void setD1Blue(void);
-void setD1White(void);
-void setD1Rainbow(int brightnessPercentage);
+void setD1Red(int *exitFlag);
+void setD1Green(int *exitFlag);
+void setD1Blue(int *exitFlag);
+void setD1White(int *exitFlag);
+void setD1Rainbow(int *exitFlag);
 
 #endif
