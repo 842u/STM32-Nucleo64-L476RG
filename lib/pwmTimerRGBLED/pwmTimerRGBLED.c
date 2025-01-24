@@ -28,11 +28,6 @@ static void gpioD1Setup(void) {
   HAL_GPIO_Init(D1_PORT, &gpioD1BConfig);
 }
 
-/*
-** Lower timer frequency to 1kHz.
-** Default timer input clock is 80MHz, derived from system clock.
-** clock / ((prescaler + 1) * (period + 1))
-*/
 static void timerD1Setup(void) {
   htim3.Instance = D1_TIMER;
   htim3.Init.Prescaler = D1_TIMER_PRESCALER;
@@ -101,51 +96,51 @@ void pwmTimerRGBLEDInit(void) {
   pwmD1Start();
 }
 
-void setD1Red(int *exitFlag) {
+void setD1Red(volatile int *exitFlag) {
   setD1Color(100, 0, 0);
   while (1) {
     if (*exitFlag) {
       *exitFlag = 0;
       return;
     }
-    HAL_Delay(25);
+    HAL_Delay(COLOR_LOOP_DELAY);
   }
 }
 
-void setD1Green(int *exitFlag) {
+void setD1Green(volatile int *exitFlag) {
   setD1Color(0, 100, 0);
   while (1) {
     if (*exitFlag) {
       *exitFlag = 0;
       return;
     }
-    HAL_Delay(25);
+    HAL_Delay(COLOR_LOOP_DELAY);
   }
 }
 
-void setD1Blue(int *exitFlag) {
+void setD1Blue(volatile int *exitFlag) {
   setD1Color(0, 0, 100);
   while (1) {
     if (*exitFlag) {
       *exitFlag = 0;
       return;
     }
-    HAL_Delay(25);
+    HAL_Delay(COLOR_LOOP_DELAY);
   }
 }
 
-void setD1White(int *exitFlag) {
+void setD1White(volatile int *exitFlag) {
   setD1Color(100, 100, 100);
   while (1) {
     if (*exitFlag) {
       *exitFlag = 0;
       return;
     }
-    HAL_Delay(25);
+    HAL_Delay(COLOR_LOOP_DELAY);
   }
 }
 
-void setD1Rainbow(int *exitFlag) {
+void setD1Rainbow(volatile int *exitFlag) {
   int redPercentage = 0;
   int greenPercentage = 0;
   int bluePercentage = 0;
@@ -173,7 +168,7 @@ void setD1Rainbow(int *exitFlag) {
         bluePercentage += transitions[state][2];
 
         setD1Color(redPercentage, greenPercentage, bluePercentage);
-        HAL_Delay(D1_RAINBOW_DELAY);
+        HAL_Delay(RAINBOW_COLOR_DELAY);
       }
     }
   }
