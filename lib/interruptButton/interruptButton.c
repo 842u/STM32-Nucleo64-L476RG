@@ -1,3 +1,10 @@
+/**
+ * External interrupt generation from SW1.
+ * Interrupt flag used to break out of the infinite color functions from
+ * pwmTimerRGBLED lib.
+ * TIM4 debouncing multiple interrupts from SW1 noise.
+ */
+
 #include "interruptButton.h"
 
 static TIM_HandleTypeDef htim4;
