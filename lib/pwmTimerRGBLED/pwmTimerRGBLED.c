@@ -7,7 +7,7 @@ static void gpioD1Setup(void) {
   gpioD1RConfig.Mode = GPIO_MODE_AF_PP;
   gpioD1RConfig.Pin = D1_R_PIN;
   gpioD1RConfig.Pull = GPIO_NOPULL;
-  gpioD1RConfig.Speed = GPIO_SPEED_HIGH;
+  gpioD1RConfig.Speed = GPIO_SPEED_LOW;
   gpioD1RConfig.Alternate = GPIO_AF2_TIM3;
   HAL_GPIO_Init(D1_PORT, &gpioD1RConfig);
 
@@ -15,7 +15,7 @@ static void gpioD1Setup(void) {
   gpioD1GConfig.Mode = GPIO_MODE_AF_PP;
   gpioD1GConfig.Pin = D1_G_PIN;
   gpioD1GConfig.Pull = GPIO_NOPULL;
-  gpioD1GConfig.Speed = GPIO_SPEED_HIGH;
+  gpioD1GConfig.Speed = GPIO_SPEED_LOW;
   gpioD1GConfig.Alternate = GPIO_AF2_TIM3;
   HAL_GPIO_Init(D1_PORT, &gpioD1GConfig);
 
@@ -23,16 +23,11 @@ static void gpioD1Setup(void) {
   gpioD1BConfig.Mode = GPIO_MODE_AF_PP;
   gpioD1BConfig.Pin = D1_B_PIN;
   gpioD1BConfig.Pull = GPIO_NOPULL;
-  gpioD1BConfig.Speed = GPIO_SPEED_HIGH;
+  gpioD1BConfig.Speed = GPIO_SPEED_LOW;
   gpioD1BConfig.Alternate = GPIO_AF2_TIM3;
   HAL_GPIO_Init(D1_PORT, &gpioD1BConfig);
 }
 
-/*
-** Lower timer frequency to 1kHz.
-** Default timer input clock is 80MHz, derived from system clock.
-** clock / ((prescaler + 1) * (period + 1))
-*/
 static void timerD1Setup(void) {
   htim3.Instance = D1_TIMER;
   htim3.Init.Prescaler = D1_TIMER_PRESCALER;
@@ -82,6 +77,16 @@ static double calculatePercentage(double percentage, double value) {
   return (percentage / 100.0) * value;
 }
 
+static void setD1Color(int redPercentage, int greenPercentage,
+                       int bluePercentage) {
+  __HAL_TIM_SET_COMPARE(&htim3, D1_R_CHANNEL,
+                        calculatePercentage(redPercentage, D1_TIMER_PERIOD));
+  __HAL_TIM_SET_COMPARE(&htim3, D1_G_CHANNEL,
+                        calculatePercentage(greenPercentage, D1_TIMER_PERIOD));
+  __HAL_TIM_SET_COMPARE(&htim3, D1_B_CHANNEL,
+                        calculatePercentage(bluePercentage, D1_TIMER_PERIOD));
+}
+
 void pwmTimerRGBLEDInit(void) {
   __HAL_RCC_TIM3_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -91,17 +96,55 @@ void pwmTimerRGBLEDInit(void) {
   pwmD1Start();
 }
 
-void setD1Color(int redPercentage, int greenPercentage, int bluePercentage) {
-  __HAL_TIM_SET_COMPARE(&htim3, D1_R_CHANNEL,
-                        calculatePercentage(redPercentage, D1_TIMER_PERIOD));
-  __HAL_TIM_SET_COMPARE(&htim3, D1_G_CHANNEL,
-                        calculatePercentage(greenPercentage, D1_TIMER_PERIOD));
-  __HAL_TIM_SET_COMPARE(&htim3, D1_B_CHANNEL,
-                        calculatePercentage(bluePercentage, D1_TIMER_PERIOD));
+void setD1Red(volatile int *exitFlag) {
+  setD1Color(100, 0, 0);
+  while (1) {
+    if (*exitFlag) {
+      *exitFlag = 0;
+      return;
+    }
+    HAL_Delay(COLOR_LOOP_DELAY);
+  }
 }
 
-void setD1Rainbow(int *redPercentage, int *greenPercentage, int *bluePercentage,
-                  int brightnessPercentage) {
+void setD1Green(volatile int *exitFlag) {
+  setD1Color(0, 100, 0);
+  while (1) {
+    if (*exitFlag) {
+      *exitFlag = 0;
+      return;
+    }
+    HAL_Delay(COLOR_LOOP_DELAY);
+  }
+}
+
+void setD1Blue(volatile int *exitFlag) {
+  setD1Color(0, 0, 100);
+  while (1) {
+    if (*exitFlag) {
+      *exitFlag = 0;
+      return;
+    }
+    HAL_Delay(COLOR_LOOP_DELAY);
+  }
+}
+
+void setD1White(volatile int *exitFlag) {
+  setD1Color(100, 100, 100);
+  while (1) {
+    if (*exitFlag) {
+      *exitFlag = 0;
+      return;
+    }
+    HAL_Delay(COLOR_LOOP_DELAY);
+  }
+}
+
+void setD1Rainbow(volatile int *exitFlag) {
+  int redPercentage = 0;
+  int greenPercentage = 0;
+  int bluePercentage = 0;
+
   const int transitions[8][3] = {
       {1, 0, 0},  // Red increase
       {0, 1, 0},  // Green increase
@@ -113,14 +156,20 @@ void setD1Rainbow(int *redPercentage, int *greenPercentage, int *bluePercentage,
       {-1, 0, 0}  // Red decrease
   };
 
-  for (int state = 0; state < 8; state++) {
-    for (int i = 0; i <= brightnessPercentage; i++) {
-      *redPercentage += transitions[state][0];
-      *greenPercentage += transitions[state][1];
-      *bluePercentage += transitions[state][2];
+  while (1) {
+    for (int state = 0; state < 8; state++) {
+      for (int i = 0; i <= 100; i++) {
+        if (*exitFlag) {
+          *exitFlag = 0;
+          return;
+        }
+        redPercentage += transitions[state][0];
+        greenPercentage += transitions[state][1];
+        bluePercentage += transitions[state][2];
 
-      setD1Color(*redPercentage, *greenPercentage, *bluePercentage);
-      HAL_Delay(D1_RAINBOW_DELAY + (100 - brightnessPercentage));
+        setD1Color(redPercentage, greenPercentage, bluePercentage);
+        HAL_Delay(RAINBOW_COLOR_DELAY);
+      }
     }
   }
 }

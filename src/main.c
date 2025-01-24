@@ -1,18 +1,19 @@
 #include "main.h"
+#include "interruptButton.h"
 #include "pwmTimerRGBLED.h"
-
-#define BLINK_DELAY 250
 
 int main() {
   HAL_Init();
   pwmTimerRGBLEDInit();
+  interruptButtonInit();
 
-  int redPercentage = 0;
-  int greenPercentage = 0;
-  int bluePercentage = 0;
+  ledColorFunction ledModes[5] = {setD1Red, setD1Green, setD1Blue, setD1White,
+                                  setD1Rainbow};
 
   while (1) {
-    setD1Rainbow(&redPercentage, &greenPercentage, &bluePercentage, 100);
+    for (int i = 0, currentMode = 0; i < 5; i++, currentMode++) {
+      ledModes[currentMode](&interruptFlag);
+    }
   }
 }
 
