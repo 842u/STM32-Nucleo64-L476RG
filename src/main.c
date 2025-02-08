@@ -36,7 +36,7 @@ int main() {
 
   while (1) {
     HAL_UART_Transmit(&huart4, data, sizeof(data) - 1, 50);
-    onBoardLD2Blink(500);
+    onBoardLD2Blink(2000);
   }
 }
 
