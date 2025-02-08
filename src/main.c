@@ -32,7 +32,10 @@ int main() {
   huart4.Init = UART4_initStruct;
   HAL_UART_Init(&huart4);
 
+  uint8_t data[] = "TOGGLE\n";
+
   while (1) {
+    HAL_UART_Transmit(&huart4, data, sizeof(data) - 1, 50);
     onBoardLD2Blink(500);
   }
 }
