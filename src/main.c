@@ -10,18 +10,26 @@ int main() {
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_UART4_CLK_ENABLE();
 
-  GPIO_InitTypeDef GPIO_UART4_TX_initStruct = {0};
-  GPIO_UART4_TX_initStruct.Pin = GPIO_PIN_10;
-  GPIO_UART4_TX_initStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_UART4_TX_initStruct.Pull = GPIO_NOPULL;
-  GPIO_UART4_TX_initStruct.Alternate = GPIO_AF8_UART4;
-  GPIO_UART4_TX_initStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  HAL_GPIO_Init(GPIOC, &GPIO_UART4_TX_initStruct);
+  // GPIO_InitTypeDef GPIO_UART4_TX_initStruct = {0};
+  // GPIO_UART4_TX_initStruct.Alternate = GPIO_AF8_UART4;
+  // GPIO_UART4_TX_initStruct.Mode = GPIO_MODE_AF_PP;
+  // GPIO_UART4_TX_initStruct.Pin = GPIO_PIN_10;
+  // GPIO_UART4_TX_initStruct.Pull = GPIO_NOPULL;
+  // GPIO_UART4_TX_initStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  // HAL_GPIO_Init(GPIOC, &GPIO_UART4_TX_initStruct);
+
+  GPIO_InitTypeDef GPIO_UART4_RX_initStruct = {0};
+  GPIO_UART4_RX_initStruct.Alternate = GPIO_AF8_UART4;
+  GPIO_UART4_RX_initStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_UART4_RX_initStruct.Pin = GPIO_PIN_11;
+  GPIO_UART4_RX_initStruct.Pull = GPIO_PULLUP;
+  GPIO_UART4_RX_initStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(GPIOC, &GPIO_UART4_RX_initStruct);
 
   UART_InitTypeDef UART4_initStruct = {0};
   UART4_initStruct.BaudRate = 9600;
   UART4_initStruct.HwFlowCtl = UART_HWCONTROL_NONE;
-  UART4_initStruct.Mode = UART_MODE_TX;
+  UART4_initStruct.Mode = UART_MODE_RX;
   UART4_initStruct.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
   UART4_initStruct.OverSampling = UART_OVERSAMPLING_16;
   UART4_initStruct.Parity = UART_PARITY_NONE;
@@ -32,11 +40,18 @@ int main() {
   huart4.Init = UART4_initStruct;
   HAL_UART_Init(&huart4);
 
-  uint8_t data[] = "TOGGLE\n";
+  // uint8_t data_TX[] = "TOGGLE\n";
+  uint8_t data_RX = '0';
 
   while (1) {
-    HAL_UART_Transmit(&huart4, data, sizeof(data) - 1, 50);
-    onBoardLD2Blink(2000);
+    HAL_UART_Receive(&huart4, &data_RX, 1, 50);
+    // HAL_UART_Transmit(&huart4, data, sizeof(data) - 1, 50);
+    // onBoardLD2Blink(2000);
+    if (data_RX == '0') {
+      HAL_GPIO_WritePin(ON_BOARD_LD2_PORT, ON_BOARD_LD2_PIN, GPIO_PIN_RESET);
+    } else if (data_RX == '1') {
+      HAL_GPIO_WritePin(ON_BOARD_LD2_PORT, ON_BOARD_LD2_PIN, GPIO_PIN_SET);
+    }
   }
 }
 
