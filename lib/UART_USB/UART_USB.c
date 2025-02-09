@@ -1,3 +1,8 @@
+/**
+ * FT232R USB UART IC used for UART -> USB conversion.
+ * For more info check docs for electric schematic.
+ */
+
 #include "UART_USB.h"
 
 static UART_HandleTypeDef huart4;
