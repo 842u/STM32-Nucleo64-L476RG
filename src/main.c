@@ -1,19 +1,12 @@
 #include "main.h"
-#include "interruptButton.h"
-#include "pwmTimerRGBLED.h"
+#include "UART_USB.h"
 
 int main() {
   HAL_Init();
-  pwmTimerRGBLEDInit();
-  interruptButtonInit();
-
-  ledColorFunction ledModes[5] = {setD1Red, setD1Green, setD1Blue, setD1White,
-                                  setD1Rainbow};
+  UART_USB_Init();
 
   while (1) {
-    for (int i = 0, currentMode = 0; i < 5; i++, currentMode++) {
-      ledModes[currentMode](&interruptFlag);
-    }
+    UART4_HandleReceive();
   }
 }
 
