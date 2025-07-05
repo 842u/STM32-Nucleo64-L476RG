@@ -28,6 +28,15 @@ static void GPIO_UART4_RX_Setup(void) {
   HAL_GPIO_Init(GPIOC, &GPIO_UART4_RX_initStruct);
 }
 
+static void GPIO_ADC1_IN_Setup(void) {
+  GPIO_InitTypeDef GPIO_ADC1_IN_initStruct = {0};
+  GPIO_ADC1_IN_initStruct.Mode = GPIO_MODE_ANALOG_ADC_CONTROL;
+  GPIO_ADC1_IN_initStruct.Pin = GPIO_PIN_0;
+  GPIO_ADC1_IN_initStruct.Pull = GPIO_NOPULL;
+  GPIO_ADC1_IN_initStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_ADC1_IN_initStruct);
+}
+
 static void UART4_Setup(void) {
   UART_InitTypeDef UART4_initStruct = {0};
   UART4_initStruct.BaudRate = 9600;
@@ -64,12 +73,17 @@ static void NVIC_Setup(void) {
 }
 
 void ADC_UART_USB_Init(void) {
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  GPIO_ADC1_IN_Setup();
+
   __HAL_RCC_UART4_CLK_ENABLE();
-  __HAL_RCC_TIM4_CLK_ENABLE();
   GPIO_UART4_TX_Setup();
   GPIO_UART4_RX_Setup();
   UART4_Setup();
+
+  __HAL_RCC_TIM4_CLK_ENABLE();
   TIM4_Setup();
+
   NVIC_Setup();
 }
 
