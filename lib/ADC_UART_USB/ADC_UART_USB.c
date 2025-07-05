@@ -7,6 +7,7 @@
 
 static UART_HandleTypeDef huart4;
 static TIM_HandleTypeDef htim4;
+static ADC_HandleTypeDef hadc1;
 
 static void GPIO_UART4_TX_Setup(void) {
   GPIO_InitTypeDef GPIO_UART4_TX_initStruct = {0};
@@ -35,6 +36,35 @@ static void GPIO_ADC1_IN_Setup(void) {
   GPIO_ADC1_IN_initStruct.Pull = GPIO_NOPULL;
   GPIO_ADC1_IN_initStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(GPIOA, &GPIO_ADC1_IN_initStruct);
+}
+
+static void ADC1_Setup(void) {
+  ADC_InitTypeDef ADC1_initStruct = {0};
+  ADC1_initStruct.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV1;
+  ADC1_initStruct.Resolution = ADC_RESOLUTION_12B;
+  ADC1_initStruct.DataAlign = ADC_DATAALIGN_RIGHT;
+  ADC1_initStruct.ScanConvMode = ADC_SCAN_DISABLE;
+  ADC1_initStruct.EOCSelection = ADC_EOC_SINGLE_CONV;
+  ADC1_initStruct.LowPowerAutoWait = ENABLE;
+  ADC1_initStruct.ContinuousConvMode = DISABLE;
+  ADC1_initStruct.DiscontinuousConvMode = DISABLE;
+  ADC1_initStruct.DMAContinuousRequests = DISABLE;
+  ADC1_initStruct.Overrun = ADC_OVR_DATA_PRESERVED;
+  ADC1_initStruct.OversamplingMode = DISABLE;
+
+  ADC_ChannelConfTypeDef ADC1_CH5_confStruct = {0};
+  ADC1_CH5_confStruct.Channel = ADC_CHANNEL_5;
+  ADC1_CH5_confStruct.Rank = ADC_REGULAR_RANK_1;
+  ADC1_CH5_confStruct.SamplingTime = ADC_SAMPLETIME_12CYCLES_5;
+  ADC1_CH5_confStruct.SingleDiff = ADC_SINGLE_ENDED;
+  ADC1_CH5_confStruct.OffsetNumber = ADC_OFFSET_NONE;
+  ADC1_CH5_confStruct.Offset = 0;
+
+  hadc1.Instance = ADC1;
+  hadc1.Init = ADC1_initStruct;
+
+  HAL_ADC_Init(&hadc1);
+  HAL_ADC_ConfigChannel(&hadc1, &ADC1_CH5_confStruct);
 }
 
 static void UART4_Setup(void) {
@@ -73,12 +103,17 @@ static void NVIC_Setup(void) {
 }
 
 void ADC_UART_USB_Init(void) {
+  __HAL_RCC_ADC_CLK_ENABLE();
+  ADC1_Setup();
+
   __HAL_RCC_GPIOA_CLK_ENABLE();
   GPIO_ADC1_IN_Setup();
 
-  __HAL_RCC_UART4_CLK_ENABLE();
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   GPIO_UART4_TX_Setup();
   GPIO_UART4_RX_Setup();
+
+  __HAL_RCC_UART4_CLK_ENABLE();
   UART4_Setup();
 
   __HAL_RCC_TIM4_CLK_ENABLE();
