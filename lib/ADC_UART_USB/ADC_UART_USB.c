@@ -89,7 +89,7 @@ static void TIM4_Setup(void) {
   TIM4_initStruct.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   TIM4_initStruct.CounterMode = TIM_COUNTERMODE_UP;
   TIM4_initStruct.Prescaler = 80000 - 1;
-  TIM4_initStruct.Period = 1000 - 1;
+  TIM4_initStruct.Period = 200 - 1;
 
   htim4.Instance = TIM4;
   htim4.Init = TIM4_initStruct;
