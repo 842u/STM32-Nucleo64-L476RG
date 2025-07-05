@@ -3,7 +3,7 @@
 
 int main() {
   HAL_Init();
-  UART_USB_Init();
+  ADC_UART_USB_Init();
 
   while (1) {
   }
