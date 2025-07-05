@@ -125,10 +125,20 @@ void ADC_UART_USB_Init(void) {
 void TIM4_IRQHandler(void) { HAL_TIM_IRQHandler(&htim4); }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-  __HAL_TIM_SET_COUNTER(&htim4, 0);
-
   if (htim->Instance == TIM4) {
-    uint8_t data_TX[] = "LED OFF\n";
-    HAL_UART_Transmit(&huart4, data_TX, sizeof(data_TX) - 1, 50);
+    __HAL_TIM_SET_COUNTER(&htim4, 0);
+
+    HAL_ADC_Start(&hadc1);
+
+    if (HAL_ADC_PollForConversion(&hadc1, 10) == HAL_OK) {
+      uint32_t adcValue = HAL_ADC_GetValue(&hadc1);
+
+      char msg[32];
+      int len = sprintf(msg, "ADC: %lu\r\n", adcValue);
+
+      HAL_UART_Transmit(&huart4, (uint8_t *)msg, len, 50);
+    }
+
+    HAL_ADC_Stop(&hadc1);
   }
 }
